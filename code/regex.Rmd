@@ -1,0 +1,145 @@
+---
+title: "Assignment 3: Regex"
+author: "Khyati Naik"
+date: "`r Sys.Date()`"
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+```
+
+### Exercise 1
+
+Using the 173 majors listed in fivethirtyeight.com’s College Majors dataset [https://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/], provide code that identifies the majors that contain either "DATA" or "STATISTICS"
+
+
+```{r}
+#read the dataset from github link
+col_majors_df<-read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/majors-list.csv")
+
+str_subset(col_majors_df[[2]], "(DATA|STATISTICS)")
+```
+
+
+### Exercise 2  
+
+Write code that transforms the data below:  
+[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"  
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+[13] "olive"        "salal berry"  
+  
+Into a format like this:  
+  
+c("bell pepper", "bilberry", "blackberry", "blood orange", "blueberry", "cantaloupe", "chili pepper", "cloudberry", "elderberry", "lime", "lychee", "mulberry", "olive", "salal berry")
+  
+
+```{r}
+fruit_str <- '[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+[13] "olive"        "salal berry"'
+
+# create a fruit list
+fruit_list <- str_extract_all(string = fruit_str, pattern = '\\".*?\\"')
+#create a fruit string
+fruit_str <- str_c(fruit_list[[1]], collapse = ', ')
+
+str_glue('c({fruit_str})', items = fruit_str)
+```
+
+
+### Exercise 3  
+
+__Describe, in words, what these expressions will match:__
+
+*   (.)\1\1  
+(.) will create a capture group to match any character.  
+\1 will match the results of above capture group.  
+\1 will match the results of above capture group again.  
+Thus, this regular expression will search for a character that is repeated 3 times continuously.  
+example: aaap
+
+```{r}
+string_exam <- c('aaap', 'anna','paneaean', 'asafa', 'rdghjgdr')
+
+str_view(string_exam, "(.)\\1\\1")
+```
+
+
+*   "(.)(.)\\2\\1"  
+(.) will create a capture group 1 to match any character.  
+(.) will create a capture group 2 to match any character.  
+\\2 will look for capture group 2.  
+\\1 will look for capture group 1.  
+
+Thus, this regular expression will look for a two character string which is immediately followed in reverse order.  
+example: anna, goog
+
+```{r}
+str_view(string_exam, "(.)(.)\\2\\1")
+```
+
+
+*   (..)\1  
+(..) will create a capture group to match any two characters.  
+\1 will match the results of above capture group.  
+Thus, this regular expression will search for repetition of any two characters.  
+example: eaea
+
+```{r}
+str_view(string_exam, "(..)\\1")
+```
+
+*   "(.).\\1.\\1"  
+(.) will create a capture group to match any character.  
+. will look for any character.  
+\\1 will look for capture group 1.  
+. will look for any character.  
+\\1 will look for capture group 1.  
+
+Thus, in this regular expression search, 1st, 3rd and 5th character should be the same. 2nd and 4th character can be anything.  
+
+```{r}
+str_view(string_exam, "(.).\\1.\\1")
+```
+
+*   "(.)(.)(.).\*\\3\\2\\1"  
+(.) will create a capture group 1 to match any character.  
+(.) will create a capture group 2 to match any character.  
+(.) will create a capture group 3 to match any character.  
+.\* zero or more characters.  
+\\3 will look for capture group 3.  
+\\2 will look for capture group 2.  
+\\1 will look for capture group 1.  
+
+Thus, this regular expression will capture three groups of characters followed by zero or more characters and the three groups in reverse order.
+
+```{r}
+str_view(string_exam, "(.)(.)(.).*\\3\\2\\1")
+```
+
+### Exercise 4  
+
+__Construct regular expressions to match words that:__
+
+*   Start and end with the same character.
+
+```{r}
+string_examp <- c('goog', ' church', 'eleven')
+str_view(string_examp, "^(.).*\\1$")
+```
+
+
+*   Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)
+
+```{r}
+str_view(string_examp,"(..).*\\1")
+```
+
+
+*   Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.)
+
+```{r}
+str_view(string_examp,"(.).*\\1.*\\1")
+```
